@@ -5,6 +5,8 @@ namespace Exercicio1ProgWeb3.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     public class CadastroClienteController : ControllerBase
     {
         private static readonly string[] Nomes = new[]
@@ -23,38 +25,53 @@ namespace Exercicio1ProgWeb3.Controllers
             _logger = logger;
             cadastros = Enumerable.Range(1, 5).Select(index => new CadastroCliente
             {
-                Cpf = Random.Shared.NextInt64(00000000000, 99999999999),
+                Cpf = $"{Random.Shared.NextInt64(00000000000, 99999999999)}",
                 Nome = Nomes[Random.Shared.Next(Nomes.Length)],
-                Nascimento = data.AddDays(geraData.Next((DateTime.Today - data).Days))
+                Nascimento = data.AddDays(geraData.Next((DateTime.Today - data).Days)).Date
             })
             .ToList();
         }
 
-        [HttpGet]
-        public List<CadastroCliente> Consultar(int index)
+        [HttpGet("/cadastros/{index}/consultar")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult <List<CadastroCliente>> Consultar(int index)
         {
-            return cadastros;
+            if (index > 4)
+            {
+                return NotFound();
+            }
+            return Ok(cadastros[index]);
         }
 
-        [HttpPost]
-        public CadastroCliente Inserir(CadastroCliente cadastro)
+        [HttpPost("/cadastros/{index}/inserir")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public ActionResult<CadastroCliente> Inserir([FromBody]CadastroCliente cadastro)
         {
             cadastros.Add(cadastro);
-            return cadastro;
+            return StatusCode(201, cadastro); //VERIFICAR
         }
 
-        [HttpPut]
-        public CadastroCliente Atualizar(int index, CadastroCliente cadastro)
+        [HttpPut("/cadastros/{index}/atualizar")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Atualizar(int index, CadastroCliente cadastro)
         {
             cadastros[index] = cadastro;
-            return cadastros[index];
+            return NoContent();
         }
 
-        [HttpDelete]
-        public List<CadastroCliente> Deletar(int index)
+        [HttpDelete("/cadastros/{index}/deletar")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult Deletar(int index)
         {
+            if (index >= cadastros.Count || index < 0)
+            {
+                return NotFound();
+            }
             cadastros.RemoveAt(index);
-            return cadastros;
+            return NoContent();
         }
     }
 }
