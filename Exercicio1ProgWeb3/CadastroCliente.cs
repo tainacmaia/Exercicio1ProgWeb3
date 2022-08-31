@@ -7,13 +7,13 @@ namespace Exercicio1ProgWeb3
         [Required(ErrorMessage = "Nome obrigatório")]
         public string? Nome { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "CPF obrigatório")]
         [RegularExpression("([0-9]+)", ErrorMessage = "O CPF deve conter apenas números")]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "O CPF deve ter 11 números")]
         public string? Cpf { get; set; }
 
-        [Required(ErrorMessage = "Data de nascimento obrigatória")] //não ta funcionando
-        [DataType(DataType.Date, ErrorMessage = "Digite uma data no formato aaaa-mm-dd")]
+        [Required]
+        [DataType(DataType.Date)]
         public DateTime Nascimento { get; set; }
 
         [Range (18, int.MaxValue, ErrorMessage = "Você deve ter mais de 18 anos para se cadastrar")]
@@ -22,7 +22,7 @@ namespace Exercicio1ProgWeb3
         public int CalcularIdade()
         {
             int idade = DateTime.Now.Year - Nascimento.Year;
-            if (DateTime.Now.DayOfYear < Nascimento.DayOfYear)
+            if (DateTime.Now.DayOfYear > Nascimento.DayOfYear)
             {
                 idade--;
             }
