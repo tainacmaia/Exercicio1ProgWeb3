@@ -1,9 +1,12 @@
 ﻿using Microsoft.Data.SqlClient;
 using Dapper;
+using APICliente.Core.Model;
+using Microsoft.Extensions.Configuration;
+using APICliente.Core.Interface;
 
-namespace Exercicio1ProgWeb3.Repositories
+namespace APICliente.Infra.Data.Repository
 {
-    public class ClienteRepository
+    public class ClienteRepository : IClienteRepository
     {
         private readonly IConfiguration _configuration;
 
@@ -12,7 +15,7 @@ namespace Exercicio1ProgWeb3.Repositories
             _configuration = configuration;
         }
 
-        public Cliente GetCliente(string cpf)
+        public Cliente ConsultarCliente(string cpf)
         {
             var query = "SELECT * FROM clientes WHERE cpf = @cpf";
 
@@ -26,7 +29,7 @@ namespace Exercicio1ProgWeb3.Repositories
             return conn.QueryFirstOrDefault<Cliente>(query, parameters);
         }
 
-        public List<Cliente> GetCliente()
+        public List<Cliente> ConsultarCliente()
         {
             var query = "SELECT*FROM clientes";
 
@@ -35,7 +38,7 @@ namespace Exercicio1ProgWeb3.Repositories
             return conn.Query<Cliente>(query).ToList();
         }
 
-        public bool InsertCliente(Cliente cliente)
+        public bool InserirCliente(Cliente cliente)
         {
             var query = "INSERT INTO clientes VALUES(@cpf, @nome, @dataNascimento, @idade)";
 
@@ -50,7 +53,7 @@ namespace Exercicio1ProgWeb3.Repositories
             return conn.Execute(query, parameters) == 1;
         }
 
-        public bool DeleteCliente(long id)
+        public bool DeletarCliente(long id)
         {
             var query = "DELETE FROM clientes WHERE id = @id";
 
@@ -62,7 +65,7 @@ namespace Exercicio1ProgWeb3.Repositories
             return conn.Execute(query, parameters) == 1;
         }
 
-        public bool UpdateCliente(long id, Cliente cliente)
+        public bool AtualizarCliente(long id, Cliente cliente)
         {
             var query = "UPDATE clientes SET nome = @nome, dataNascimento = @dataNascimento," +
                 " idade = @idade WHERE id = @id";

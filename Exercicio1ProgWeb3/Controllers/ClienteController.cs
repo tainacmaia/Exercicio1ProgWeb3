@@ -1,8 +1,8 @@
-using Exercicio1ProgWeb3.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Exercicio1ProgWeb3;
+using APICliente.Core.Interface;
+using APICliente.Core.Model;
 
-namespace Exercicio1ProgWeb3.Controllers
+namespace APICliente.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -10,36 +10,33 @@ namespace Exercicio1ProgWeb3.Controllers
     [Produces("application/json")]
     public class ClienteController : ControllerBase
     {
-        public List<Cliente> ClienteList { get; set; }
-        public ClienteRepository _repositoryCliente;
+        public IClienteService _clienteService;
 
-        public ClienteController(IConfiguration configuration)
+        public ClienteController(IClienteService clienteService)
         {
-            ClienteList = new List<Cliente>();
-            _repositoryCliente = new ClienteRepository(configuration);
+            _clienteService = clienteService;
         }
-
 
         [HttpGet("/cadastros/consultarcpf")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<Cliente>> ConsultarCpf(string cpf)
+        public ActionResult<List<Cliente>> ConsultarCliente(string cpf)
         {
-            var cliente = _repositoryCliente.GetCliente(cpf);
+            var cliente = _clienteService.ConsultarCliente(cpf);
             if (cliente == null)
                 return NotFound("Cliente não encontrado");
-            return Ok(_repositoryCliente.GetCliente(cliente.Cpf));
+            return Ok(_clienteService.ConsultarCliente(cliente.Cpf));
         }
 
         [HttpGet("/cadastros/consultar")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult <List<Cliente>> Consultar()
+        public ActionResult <List<Cliente>> ConsultarCliente()
         {
-            var clientes = ClienteList;
-            if (clientes == null)
+            var cliente = _clienteService.ConsultarCliente();
+            if (cliente == null)
                 return NotFound("Não há clientes cadastrados.");
-            return Ok(_repositoryCliente.GetCliente());
+            return Ok(_clienteService.ConsultarCliente());
         }
 
         [HttpPost("/cadastros/inserir")]
@@ -48,11 +45,11 @@ namespace Exercicio1ProgWeb3.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public ActionResult<Cliente> Inserir(Cliente cliente)
         {
-            var clienteExiste = _repositoryCliente.GetCliente(cliente.Cpf);
+            var clienteExiste = _clienteService.ConsultarCliente(cliente.Cpf);
             if (clienteExiste != null)
                 return Conflict("Já existe um cliente com esse CPF.");
 
-            if (!_repositoryCliente.InsertCliente(cliente))
+            if (!_clienteService.InserirCliente(cliente))
                 return BadRequest();
 
             return CreatedAtAction(nameof(Inserir), cliente);
@@ -63,10 +60,10 @@ namespace Exercicio1ProgWeb3.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Atualizar(long id, Cliente cliente)
         {
-            if (!_repositoryCliente.UpdateCliente(id, cliente))
+            if (!_clienteService.AtualizarCliente(id, cliente))
                 return NotFound("Cliente não encontrado.");
 
-            _repositoryCliente.UpdateCliente(id, cliente);
+            _clienteService.AtualizarCliente(id, cliente);
             return NoContent();
         }
 
@@ -75,7 +72,7 @@ namespace Exercicio1ProgWeb3.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<List<Cliente>> Deletar(long id)
         {
-            if (_repositoryCliente.DeleteCliente(id))
+            if (_clienteService.DeletarCliente(id))
                 return NotFound();
             return NoContent();
         }

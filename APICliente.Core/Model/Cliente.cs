@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Win32.SafeHandles;
 
-namespace Exercicio1ProgWeb3
+namespace APICliente.Core.Model
 {
     public class Cliente
     {
