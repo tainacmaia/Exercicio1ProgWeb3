@@ -18,7 +18,7 @@ namespace APICliente.Filters
         {
             var cliente = context.ActionArguments["cliente"] as Cliente;
 
-            if (!HttpMethods.IsPost(context.HttpContext.Request.Method) &&
+            if (HttpMethods.IsPut(context.HttpContext.Request.Method) &&
                 _clienteService.ConsultarCliente(cliente.Id) == null)
             {
                 context.Result = new StatusCodeResult(StatusCodes.Status400BadRequest);

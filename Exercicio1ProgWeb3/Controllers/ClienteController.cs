@@ -64,7 +64,7 @@ namespace APICliente.Controllers
         {
             Console.WriteLine("Iniciando");
             if (!_clienteService.AtualizarCliente(id, cliente))
-                return NotFound("Cliente não encontrado.");
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
 
             _clienteService.AtualizarCliente(id, cliente);
             return NoContent();
@@ -73,6 +73,7 @@ namespace APICliente.Controllers
         [HttpDelete("/cadastros/deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public ActionResult<List<Cliente>> Deletar(long id)
         {
             if (_clienteService.DeletarCliente(id))
