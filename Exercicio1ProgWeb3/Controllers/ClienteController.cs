@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using APICliente.Core.Interface;
 using APICliente.Core.Model;
+using APICliente.Filters;
 
 namespace APICliente.Controllers
 {
@@ -8,12 +9,14 @@ namespace APICliente.Controllers
     [Route("[controller]")]
     [Consumes("application/json")]
     [Produces("application/json")]
+    [TypeFilter(typeof(LogResourceFilter))] //sem injeção
     public class ClienteController : ControllerBase
     {
         public IClienteService _clienteService;
 
         public ClienteController(IClienteService clienteService)
         {
+            Console.WriteLine("Instanciando Cliente Controller");
             _clienteService = clienteService;
         }
 
@@ -22,19 +25,20 @@ namespace APICliente.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<List<Cliente>> ConsultarCliente(string cpf)
         {
-            var cliente = _clienteService.ConsultarCliente(cpf);
-            if (cliente == null)
+            Console.WriteLine("Iniciando");
+            if (_clienteService.ConsultarCliente(cpf) == null)
                 return NotFound("Cliente não encontrado");
-            return Ok(_clienteService.ConsultarCliente(cliente.Cpf));
+            return Ok(_clienteService.ConsultarCliente(_clienteService.ConsultarCliente(cpf).Cpf));
         }
 
         [HttpGet("/cadastros/consultar")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[TypeFilter(typeof (LogAuthorizationFilter))] //sem
         public ActionResult <List<Cliente>> ConsultarCliente()
         {
-            var cliente = _clienteService.ConsultarCliente();
-            if (cliente == null)
+            Console.WriteLine("Iniciando");
+            if (_clienteService.ConsultarCliente() == null)
                 return NotFound("Não há clientes cadastrados.");
             return Ok(_clienteService.ConsultarCliente());
         }
@@ -43,11 +47,13 @@ namespace APICliente.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [TypeFilter(typeof(LogActionFilter))] //sem injeção
+        [ServiceFilter(typeof(ClienteExisteActionFilter))]
         public ActionResult<Cliente> Inserir(Cliente cliente)
         {
-            var clienteExiste = _clienteService.ConsultarCliente(cliente.Cpf);
-            if (clienteExiste != null)
-                return Conflict("Já existe um cliente com esse CPF.");
+            //var clienteExiste = _clienteService.ConsultarCliente(cliente.Cpf);
+            //if (clienteExiste != null)
+            //    return Conflict("Já existe um cliente com esse CPF.");
 
             if (!_clienteService.InserirCliente(cliente))
                 return BadRequest();
@@ -58,8 +64,11 @@ namespace APICliente.Controllers
         [HttpPut("/cadastros/atualizar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [TypeFilter(typeof(LogActionFilter))]
+        [ServiceFilter(typeof(ClienteExisteActionFilter))]
         public IActionResult Atualizar(long id, Cliente cliente)
         {
+            Console.WriteLine("Iniciando");
             if (!_clienteService.AtualizarCliente(id, cliente))
                 return NotFound("Cliente não encontrado.");
 
@@ -70,11 +79,13 @@ namespace APICliente.Controllers
         [HttpDelete("/cadastros/deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ServiceFilter(typeof(ClienteExisteActionFilter))]
         public ActionResult<List<Cliente>> Deletar(long id)
         {
             if (_clienteService.DeletarCliente(id))
-                return NotFound();
-            return NoContent();
+                return NoContent();
+            return NotFound();
+
         }
     }
 }

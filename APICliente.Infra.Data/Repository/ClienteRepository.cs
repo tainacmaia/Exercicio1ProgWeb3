@@ -15,6 +15,19 @@ namespace APICliente.Infra.Data.Repository
             _configuration = configuration;
         }
 
+        public Cliente ConsultarCliente(long id)
+        {
+            var query = "SELECT * FROM clientes WHERE id = @id";
+
+            var parameters = new DynamicParameters(new
+            {
+                id
+            });
+
+            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+
+            return conn.QueryFirstOrDefault<Cliente>(query, parameters);
+        }
         public Cliente ConsultarCliente(string cpf)
         {
             var query = "SELECT * FROM clientes WHERE cpf = @cpf";
@@ -68,7 +81,7 @@ namespace APICliente.Infra.Data.Repository
         public bool AtualizarCliente(long id, Cliente cliente)
         {
             var query = "UPDATE clientes SET nome = @nome, dataNascimento = @dataNascimento," +
-                " idade = @idade WHERE id = @id";
+                " idade = @idade, cpf = @cpf WHERE id = @id";
 
             var parameters = new DynamicParameters(cliente);
 

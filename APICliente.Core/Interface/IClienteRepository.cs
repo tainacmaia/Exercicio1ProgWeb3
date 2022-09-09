@@ -6,6 +6,7 @@ namespace APICliente.Core.Interface
     {
         List<Cliente> ConsultarCliente();
         Cliente ConsultarCliente(string cpf);
+        Cliente ConsultarCliente(long id);
         public bool InserirCliente(Cliente cliente);
         public bool AtualizarCliente(long id, Cliente cliente);
         public bool DeletarCliente(long id);
