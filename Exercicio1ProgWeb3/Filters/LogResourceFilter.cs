@@ -14,10 +14,6 @@ namespace APICliente.Filters
 
         public void OnResourceExecuting(ResourceExecutingContext context) //antes
         {
-            if (context.HttpContext.Request.Headers.Keys.Contains("Code"))
-            {
-                context.HttpContext.Request.Headers.Add("Code", Guid.NewGuid().ToString());
-            }
             relogio.Start();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Data.SqlClient;
 
 namespace APICliente.Filters
 {
@@ -13,25 +14,29 @@ namespace APICliente.Filters
                 Title = "Erro Inesperado",
                 Detail = "Ocorreu um erro inesperado na solicitação",
                 Type = context.Exception.GetType().Name
-            };
-
-            Console.WriteLine($"{context.Exception.GetType().Name}, {context.Exception.GetType()}");
+            };           
 
             switch (context.Exception)
             {
-                case ArgumentNullException:
-                    context.HttpContext.Response.StatusCode = StatusCodes.Status501NotImplemented;
+                case SqlException:
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                    problem.Title = "Erro inesperado ao se comunicar com o banco de dados.";
                     context.Result = new ObjectResult(problem);
                     break;
-                case DivideByZeroException:
-                    context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                case NullReferenceException:
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status417ExpectationFailed;
+                    problem.Title = "Erro inesperado no sistema.";
                     context.Result = new ObjectResult(problem);
                     break;
                 default:
                     context.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    problem.Title = "Erro inesperado. Tente novamente.";
                     context.Result = new ObjectResult(problem);
                     break;
             }
+
+            Console.WriteLine($"Tipo da exceção: {context.Exception.GetType().Name};\nMensagem: {context.Exception.Message};\nStack Trace {context.Exception.StackTrace};");
         }
+        
     }
 }

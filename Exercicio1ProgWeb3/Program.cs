@@ -13,7 +13,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddMvc(options =>
-options.Filters.Add<LogResultFilter>()
+{
+    options.Filters.Add<GeneralExceptionFilter>();
+    options.Filters.Add<LogResourceFilter>();
+}
 );
 
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();

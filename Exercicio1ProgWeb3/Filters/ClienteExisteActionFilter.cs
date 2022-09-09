@@ -1,6 +1,8 @@
 ﻿using APICliente.Core.Interface;
+using APICliente.Core.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Text;
 
 namespace APICliente.Filters
 {
@@ -14,16 +16,19 @@ namespace APICliente.Filters
         }
         public override void OnActionExecuting (ActionExecutingContext context)
         {
-            if (!HttpMethods.IsPost(context.HttpContext.Request.Method) && 
-                _clienteService.ConsultarCliente((long)context.ActionArguments["id"]) == null)
+            var cliente = context.ActionArguments["cliente"] as Cliente;
+
+            if (!HttpMethods.IsPost(context.HttpContext.Request.Method) &&
+                _clienteService.ConsultarCliente(cliente.Id) == null)
             {
-                context.Result = new StatusCodeResult(StatusCodes.Status404NotFound);
+                context.Result = new StatusCodeResult(StatusCodes.Status400BadRequest);
             }
 
             else if (HttpMethods.IsPost(context.HttpContext.Request.Method) &&
-                _clienteService.ConsultarCliente((string)context.ActionArguments["cpf"]) != null)
+                _clienteService.ConsultarCliente(cliente.Cpf) != null)
             {
                 context.Result = new StatusCodeResult(StatusCodes.Status409Conflict);
+                Console.WriteLine("Esse CPF já existe.");
             }
         }
     }

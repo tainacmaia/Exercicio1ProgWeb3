@@ -9,7 +9,8 @@ namespace APICliente.Controllers
     [Route("[controller]")]
     [Consumes("application/json")]
     [Produces("application/json")]
-    [TypeFilter(typeof(LogResourceFilter))] //sem injeção
+    [TypeFilter(typeof(LogResourceFilter))]
+
     public class ClienteController : ControllerBase
     {
         public IClienteService _clienteService;
@@ -34,7 +35,6 @@ namespace APICliente.Controllers
         [HttpGet("/cadastros/consultar")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[TypeFilter(typeof (LogAuthorizationFilter))] //sem
         public ActionResult <List<Cliente>> ConsultarCliente()
         {
             Console.WriteLine("Iniciando");
@@ -47,14 +47,9 @@ namespace APICliente.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [TypeFilter(typeof(LogActionFilter))] //sem injeção
         [ServiceFilter(typeof(ClienteExisteActionFilter))]
         public ActionResult<Cliente> Inserir(Cliente cliente)
         {
-            //var clienteExiste = _clienteService.ConsultarCliente(cliente.Cpf);
-            //if (clienteExiste != null)
-            //    return Conflict("Já existe um cliente com esse CPF.");
-
             if (!_clienteService.InserirCliente(cliente))
                 return BadRequest();
 
@@ -64,7 +59,6 @@ namespace APICliente.Controllers
         [HttpPut("/cadastros/atualizar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [TypeFilter(typeof(LogActionFilter))]
         [ServiceFilter(typeof(ClienteExisteActionFilter))]
         public IActionResult Atualizar(long id, Cliente cliente)
         {
@@ -79,13 +73,11 @@ namespace APICliente.Controllers
         [HttpDelete("/cadastros/deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ServiceFilter(typeof(ClienteExisteActionFilter))]
         public ActionResult<List<Cliente>> Deletar(long id)
         {
             if (_clienteService.DeletarCliente(id))
                 return NoContent();
             return NotFound();
-
         }
     }
 }
