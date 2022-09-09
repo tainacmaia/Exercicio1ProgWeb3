@@ -20,16 +20,19 @@ namespace APICliente.Filters
             {
                 case SqlException:
                     context.HttpContext.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                    problem.Status = 503;
                     problem.Title = "Erro inesperado ao se comunicar com o banco de dados.";
                     context.Result = new ObjectResult(problem);
                     break;
                 case NullReferenceException:
                     context.HttpContext.Response.StatusCode = StatusCodes.Status417ExpectationFailed;
+                    problem.Status = 417;
                     problem.Title = "Erro inesperado no sistema.";
                     context.Result = new ObjectResult(problem);
                     break;
                 default:
                     context.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    problem.Status = 500;
                     problem.Title = "Erro inesperado. Tente novamente.";
                     context.Result = new ObjectResult(problem);
                     break;
