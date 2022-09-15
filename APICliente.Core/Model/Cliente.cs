@@ -21,6 +21,7 @@ namespace APICliente.Core.Model
         [Range (18, int.MaxValue, ErrorMessage = "Você deve ter mais de 18 anos para se cadastrar")]
         public int? Idade { get { return CalcularIdade(); } }
 
+        public string? Permissao { get; set; }
         public int CalcularIdade()
         {
             int idade = DataNascimento.HasValue ? DateTime.Now.Year - DataNascimento.Value.Year : 0;

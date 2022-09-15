@@ -90,9 +90,19 @@ namespace APICliente.Infra.Data.Repository
             parameters.Add("nome", cliente.Nome);
             parameters.Add("dataNascimento", cliente.DataNascimento);
 
-            using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            try
+            {
+                using var conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
-            return conn.Execute(query, parameters) == 1;
+                return conn.Execute(query, parameters) == 1;
+            }
+
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Erro ao se comunicar com o banco. Mensagem: {ex.Message}; Stack Trace: {ex.StackTrace}; Target Site: {ex.TargetSite}");
+                return false;
+            }
+            
         }
     }
 }

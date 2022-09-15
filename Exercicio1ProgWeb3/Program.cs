@@ -16,11 +16,11 @@ builder.Services.AddMvc(options =>
 {
     options.Filters.Add<GeneralExceptionFilter>();
     options.Filters.Add<LogResourceFilter>();
-}
-);
+});
 
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ClienteExisteActionFilter>();
 
 var app = builder.Build();
